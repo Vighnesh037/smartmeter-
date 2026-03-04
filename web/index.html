@@ -1,93 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Smart Socket Dashboard</title>
+<title>Smart Socket Dashboard</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
+<style>
 
-    body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      min-height: 100vh;
-      padding: 30px;
-      color: white;
-    }
+body{
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+font-family:Segoe UI;
+color:white;
+padding:20px;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 32px;
-      letter-spacing: 1px;
-      background: linear-gradient(90deg, #00f5ff, #00ff88);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+h1{
+text-align:center;
+margin-bottom:30px;
+background:linear-gradient(90deg,#00f5ff,#00ff88);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+}
 
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 0 15px rgba(0,255,255,0.2);
-      transition: 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
+.card{
+background:rgba(255,255,255,0.05);
+padding:18px;
+border-radius:15px;
+box-shadow:0 0 15px rgba(0,255,255,0.2);
+}
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 25px rgba(0,255,255,0.5);
-    }
+.value{
+font-size:24px;
+font-weight:bold;
+color:#00f5ff;
+}
 
-    .card h2 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      opacity: 0.8;
-    }
+.highlight{
+color:#00ff88;
+}
 
-    .value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #00f5ff;
-      transition: 0.3s;
-    }
+.chartBox{
+margin-top:25px;
+height:250px;
+}
 
-    .highlight {
-      color: #00ff88;
-    }
-
-    .pulse {
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { text-shadow: 0 0 5px #00f5ff; }
-      50% { text-shadow: 0 0 20px #00f5ff; }
-      100% { text-shadow: 0 0 5px #00f5ff; }
-    }
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 14px;
-      opacity: 0.6;
-    }
-  </style>
+</style>
 </head>
 
 <body>
@@ -96,107 +61,168 @@
 
 <div class="grid">
 
-  <div class="card">
-    <h2>Voltage (V)</h2>
-    <div class="value pulse" id="voltage">--</div>
-  </div>
+<div class="card">
+Voltage
+<div class="value" id="voltage">--</div>
+</div>
 
-  <div class="card">
-    <h2>Current (A)</h2>
-    <div class="value pulse" id="current">--</div>
-  </div>
+<div class="card">
+Current
+<div class="value" id="current">--</div>
+</div>
 
-  <div class="card">
-    <h2>Power (W)</h2>
-    <div class="value pulse" id="power">--</div>
-  </div>
+<div class="card">
+Power
+<div class="value" id="power">--</div>
+</div>
 
-  <div class="card">
-    <h2>Energy (kWh)</h2>
-    <div class="value" id="energy">--</div>
-  </div>
+<div class="card">
+Energy
+<div class="value" id="energy">--</div>
+</div>
 
-  <div class="card">
-    <h2>Monthly Units</h2>
-    <div class="value highlight" id="monthlyUnits">--</div>
-  </div>
+<div class="card">
+Monthly Units
+<div class="value highlight" id="units">--</div>
+</div>
 
-  <div class="card">
-    <h2>Monthly Bill (₹)</h2>
-    <div class="value highlight" id="monthlyBill">--</div>
-  </div>
+<div class="card">
+Estimated Bill
+<div class="value highlight" id="bill">--</div>
+</div>
 
-  <div class="card">
-    <h2>Peak Hours</h2>
-    <div class="value" id="peakHours">--</div>
-  </div>
+<div class="card">
+💰 Max Savings Time
+<div class="value highlight" id="maxHour">--</div>
+</div>
 
-  <div class="card">
-    <h2>Suggested Usage Hour</h2>
-    <div class="value highlight" id="suggestedHour">--</div>
-  </div>
+<div class="card">
+😊 Comfort Time
+<div class="value highlight" id="comfortHour">--</div>
+</div>
+
+<div class="card">
+₹ Estimated Savings
+<div class="value highlight" id="savings">--</div>
+</div>
 
 </div>
 
-<footer>
-  IoT Smart Energy Monitoring System | B.Tech Mini Project
-</footer>
+<div class="chartBox">
+<canvas id="powerChart"></canvas>
+</div>
 
 <script>
 
-  // 🔥 Replace with YOUR Firebase config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    databaseURL: "YOUR_DATABASE_URL"
-  };
+/* FIREBASE CONFIG */
 
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
+const firebaseConfig={
+apiKey:"",
+databaseURL:""
+};
 
-  // LIVE DATA
-  database.ref("smart_socket/live/voltage").on("value", snap => {
-    document.getElementById("voltage").innerText = snap.val()?.toFixed(1) + " V";
-  });
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
-  database.ref("smart_socket/live/current").on("value", snap => {
-    document.getElementById("current").innerText = snap.val()?.toFixed(2) + " A";
-  });
+/* VARIABLES */
 
-  database.ref("smart_socket/live/power").on("value", snap => {
-    document.getElementById("power").innerText = snap.val()?.toFixed(1) + " W";
-  });
+let power=0;
+let energy=0;
 
-  database.ref("smart_socket/live/energy").on("value", snap => {
-    document.getElementById("energy").innerText = snap.val()?.toFixed(4) + " kWh";
-  });
+let tariff=[3,3,3,3,3,3,4,4,5,5,5.5,5.5,6,6,5,5,6,6,7,7,7,7,4,4];
 
-  // MONTHLY
-  database.ref("smart_socket/monthly/units").on("value", snap => {
-    document.getElementById("monthlyUnits").innerText = snap.val()?.toFixed(3);
-  });
+/* POWER GRAPH */
 
-  database.ref("smart_socket/monthly/bill").on("value", snap => {
-    document.getElementById("monthlyBill").innerText = snap.val()?.toFixed(2);
-  });
+const powerData={
+labels:[],
+datasets:[{
+label:"Power (W)",
+data:[],
+borderColor:"#00f5ff",
+tension:0.3
+}]
+};
 
-  // ANALYTICS
-  database.ref("smart_socket/analytics/peak1").on("value", snap => {
-    const p1 = snap.val();
-    database.ref("smart_socket/analytics/peak2").once("value").then(snap2 => {
-      const p2 = snap2.val();
-      if(p1 !== null && p2 !== null)
-        document.getElementById("peakHours").innerText =
-          p1 + ":00 - " + (p1+1) + ":00 , " +
-          p2 + ":00 - " + (p2+1) + ":00";
-    });
-  });
+const powerChart=new Chart(
+document.getElementById("powerChart"),
+{
+type:"line",
+data:powerData,
+options:{animation:false}
+}
+);
 
-  database.ref("smart_socket/analytics/suggested_hour").on("value", snap => {
-    const sh = snap.val();
-    if(sh !== null)
-      document.getElementById("suggestedHour").innerText =
-        sh + ":00 - " + (sh+1) + ":00";
-  });
+/* LIVE DATA */
+
+db.ref("smart_socket/live").on("value",snap=>{
+
+let d=snap.val();
+
+if(!d) return;
+
+document.getElementById("voltage").innerText=d.voltage.toFixed(1)+" V";
+document.getElementById("current").innerText=d.current.toFixed(2)+" A";
+document.getElementById("power").innerText=d.power.toFixed(1)+" W";
+document.getElementById("energy").innerText=d.energy.toFixed(4)+" kWh";
+
+power=d.power;
+energy=d.energy;
+
+let units=energy;
+let bill=units*6;
+
+document.getElementById("units").innerText=units.toFixed(3);
+document.getElementById("bill").innerText="₹ "+bill.toFixed(2);
+
+/* GRAPH */
+
+let time=new Date().toLocaleTimeString();
+
+powerData.labels.push(time);
+powerData.datasets[0].data.push(power);
+
+if(powerData.labels.length>15){
+powerData.labels.shift();
+powerData.datasets[0].data.shift();
+}
+
+powerChart.update();
+
+});
+
+/* MAX SAVINGS HOUR */
+
+db.ref("smart_socket/analytics/max_savings_hour").on("value",snap=>{
+
+let h=snap.val();
+
+if(h!=null){
+
+document.getElementById("maxHour").innerText=h+":00 - "+(h+1)+":00";
+
+let currentHour=new Date().getHours();
+
+let currentCost=(power/1000)*tariff[currentHour];
+let cheapCost=(power/1000)*tariff[h];
+
+let saving=currentCost-cheapCost;
+
+document.getElementById("savings").innerText="₹ "+saving.toFixed(2);
+
+}
+
+});
+
+/* COMFORT HOUR */
+
+db.ref("smart_socket/analytics/comfort_savings_hour").on("value",snap=>{
+
+let h=snap.val();
+
+if(h!=null)
+document.getElementById("comfortHour").innerText=h+":00 - "+(h+1)+":00";
+
+});
 
 </script>
 
